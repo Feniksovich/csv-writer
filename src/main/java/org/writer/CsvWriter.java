@@ -10,10 +10,29 @@ import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.*;
 
+/**
+ * Класс для записи данных в CSV файлы.
+ * Использует аннотацию {@link CsvProperty} для определения полей, которые должны быть записаны в CSV.
+ */
 public class CsvWriter implements Writable {
 
+    /**
+     * Разделитель полей в CSV файле.
+     */
     private static final String DELIMITER = ",";
 
+    /**
+     * Записывает список объектов в CSV файл.
+     * Первая строка файла содержит заголовки столбцов, последующие строки - данные объектов.
+     * Поля объектов должны быть помечены аннотацией {@link CsvProperty}.
+     *
+     * @param data список объектов для записи в CSV файл
+     * @param destination путь к файлу, в который будут записаны данные
+     * @throws IOException если произошла ошибка при записи в файл
+     * @throws IllegalArgumentException если список данных пуст или null,
+     *                                  или если в классе объектов не найдено полей с аннотацией {@link CsvProperty},
+     *                                  или если значение order в аннотации отрицательное
+     */
     @Override
     public void writeToFile(List<?> data, Path destination) throws IOException {
         if (data == null || data.isEmpty()) {
@@ -41,12 +60,27 @@ public class CsvWriter implements Writable {
         }
     }
 
+    /**
+     * Извлекает названия столбцов из метаданных аннотаций
+     * в том же порядке, в котором они переданы.
+     *
+     * @param metadata список метаданных свойств
+     * @return список названий столбцов
+     */
     private List<String> getColumns(List<PropertyMetadata> metadata) {
         return metadata.stream()
                 .map(PropertyMetadata::name)
                 .toList();
     }
 
+    /**
+     * Извлекает значения полей объекта в виде строк
+     * в том же порядке, в котором переданы метаданные.
+     *
+     * @param obj объект, из которого извлекаются значения
+     * @param metadata список метаданных аннотаций
+     * @return список значений полей в виде строк
+     */
     private List<String> getValues(Object obj, List<PropertyMetadata> metadata) {
         return metadata.stream()
                 .map(property -> ReflectionUtils.getFieldValue(obj, property.field))
@@ -54,6 +88,15 @@ public class CsvWriter implements Writable {
                 .toList();
     }
 
+    /**
+     * Формирует список метаданных полей, аннотированных {@link CsvProperty},
+     * упорядоченный по значению параметра order в соответствии с компаратором {@link PropertyMetadata}:
+     * свойства с order > 0 сортируются по возрастанию и располагаются перед свойствами с order = 0.
+     *
+     * @param clazz класс, поля которого необходимо обработать
+     * @return отсортированный список метаданных свойств
+     * @throws IllegalArgumentException если значение order в аннотации отрицательное
+     */
     private List<PropertyMetadata> getOrderedProperties(Class<?> clazz) {
         final List<Field> fields = ReflectionUtils.getAnnotatedFields(CsvProperty.class, clazz);
         final List<PropertyMetadata> properties = new ArrayList<>();
@@ -75,7 +118,22 @@ public class CsvWriter implements Writable {
         return properties;
     }
 
+    /**
+     * Метаданные аннотированного поля класса.
+     *
+     * @param field поле класса
+     * @param name название столбца в CSV представлении
+     * @param order порядок сортировки столбца
+     */
     private record PropertyMetadata(Field field, String name, int order) implements Comparable<PropertyMetadata> {
+        /**
+         * Сравнивает два объекта PropertyMetadata по полю {@code order}.
+         * Объекты с order > 0 сортируются по возрастанию и располагаются перед объектами с order = 0.
+         *
+         * @param o объект для сравнения
+         * @return отрицательное число, если текущий объект должен быть раньше,
+         *         положительное число, если позже, 0 если равны
+         */
         @Override
         public int compareTo(PropertyMetadata o) {
             final int orderA = this.order;

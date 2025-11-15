@@ -10,6 +10,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Главный класс приложения, демонстрирующий использование {@link CsvWriter}
+ * для записи данных в CSV файлы.
+ */
 public class Main {
 
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
