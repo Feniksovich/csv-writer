@@ -7,6 +7,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Path;
 import java.util.*;
 
 public class CsvWriter implements Writable {
@@ -14,7 +15,7 @@ public class CsvWriter implements Writable {
     private static final String DELIMITER = ",";
 
     @Override
-    public void writeToFile(List<?> data, String fileName) throws IOException {
+    public void writeToFile(List<?> data, Path destination) throws IOException {
         if (data == null || data.isEmpty()) {
             throw new IllegalArgumentException("data is null or empty");
         }
@@ -26,7 +27,7 @@ public class CsvWriter implements Writable {
             throw new IllegalArgumentException("no annotated fields found in class %s".formatted(clazz.getName()));
         }
 
-        try (final BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+        try (final BufferedWriter writer = new BufferedWriter(new FileWriter(destination.toFile()))) {
             final String header = String.join(DELIMITER, getColumns(metadata));
             writer.write(header);
             writer.newLine();

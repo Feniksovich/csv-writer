@@ -4,6 +4,7 @@ import org.writer.model.Person;
 import org.writer.model.Student;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.time.Month;
 import java.util.List;
 import java.util.logging.Level;
@@ -28,8 +29,8 @@ public class Main {
 
         final CsvWriter writer = new CsvWriter();
         try {
-            writer.writeToFile(persons, "persons.csv");
-            writer.writeToFile(students, "students.csv");
+            writer.writeToFile(persons, Path.of("persons.csv"));
+            writer.writeToFile(students, Path.of("students.csv"));
         } catch (IOException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
