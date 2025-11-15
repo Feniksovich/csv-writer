@@ -11,10 +11,10 @@ import java.time.Month;
 @Builder
 @AllArgsConstructor
 public class Person {
-    @CsvProperty(order = 2)
+    @CsvProperty(name = "first_name", order = 2)
     private String firstName;
 
-    @CsvProperty(order = 1)
+    @CsvProperty(name = "last_name", order = 1)
     private String lastName;
 
     @CsvProperty(name = "day")
