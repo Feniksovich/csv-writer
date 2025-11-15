@@ -27,12 +27,12 @@ public class CsvWriter implements Writable {
         }
 
         try (final BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            final String header = String.join(DELIMITER, getColumnsNames(metadata));
+            final String header = String.join(DELIMITER, getColumns(metadata));
             writer.write(header);
             writer.newLine();
 
             for (final Object object : data) {
-                final List<String> values = getOrderedValues(object, metadata);
+                final List<String> values = getValues(object, metadata);
                 final String line = String.join(DELIMITER, values);
                 writer.write(line);
                 writer.newLine();
@@ -40,13 +40,13 @@ public class CsvWriter implements Writable {
         }
     }
 
-    private List<String> getColumnsNames(List<PropertyMetadata> metadata) {
+    private List<String> getColumns(List<PropertyMetadata> metadata) {
         return metadata.stream()
                 .map(PropertyMetadata::name)
                 .toList();
     }
 
-    private List<String> getOrderedValues(Object obj, List<PropertyMetadata> metadata) {
+    private List<String> getValues(Object obj, List<PropertyMetadata> metadata) {
         return metadata.stream()
                 .map(property -> ReflectionUtils.getFieldValue(obj, property.field))
                 .map(String::valueOf)
