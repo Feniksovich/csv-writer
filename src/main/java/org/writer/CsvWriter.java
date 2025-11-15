@@ -60,6 +60,13 @@ public class CsvWriter implements Writable {
         for (final Field field : fields) {
             final CsvProperty annotation = field.getAnnotation(CsvProperty.class);
             final String name = annotation.name().isBlank() ? field.getName() : annotation.name();
+            final int order = annotation.order();
+
+            if (order < 0) {
+                throw new IllegalArgumentException("illegal negative order %d for field '%s' in class '%s'"
+                        .formatted(order, field.getName(), clazz.getName()));
+            }
+
             properties.add(new PropertyMetadata(field, name, annotation.order()));
         }
 
