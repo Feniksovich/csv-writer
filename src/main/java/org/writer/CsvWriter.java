@@ -70,9 +70,23 @@ public class CsvWriter implements Writable {
             properties.add(new PropertyMetadata(field, name, annotation.order()));
         }
 
-        properties.sort(Comparator.comparingInt(PropertyMetadata::order));
+        Collections.sort(properties);
         return properties;
     }
 
-    private record PropertyMetadata(Field field, String name, int order) {}
+    private record PropertyMetadata(Field field, String name, int order) implements Comparable<PropertyMetadata> {
+        @Override
+        public int compareTo(PropertyMetadata o) {
+            final int orderA = this.order;
+            final int orderB = o.order;
+
+            if (orderA > 0 && orderB > 0) {
+                return Integer.compare(orderA, orderB);
+            }
+
+            if (orderA > 0) return -1;
+            if (orderB > 0) return 1;
+            return 0;
+        }
+    }
 }
